@@ -56,6 +56,7 @@ writable/logs/*
 
 writable/session/*
 !writable/session/index.html
+mysql-data/
 
 writable/uploads/*
 !writable/uploads/index.html
