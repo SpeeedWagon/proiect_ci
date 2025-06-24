@@ -6,36 +6,27 @@ use CodeIgniter\Model;
 
 class OrderModel extends Model
 {
-    protected $DBGroup          = 'default';
-    protected $table            = 'orders';
-    protected $primaryKey       = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = true;
-    protected $allowedFields    = [];
+    /**
+     * The table associated with this model.
+     * @var string
+     */
+    protected $table = 'orders';
 
-    // Dates
-    protected $useTimestamps = false;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
+    /**
+     * The primary key of the table.
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
-    // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
-
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
+    /**
+     * Fields that are allowed to be saved.
+     * The 'created_at' field is handled by the database's DEFAULT,
+     * but including it here allows for programmatically setting it if needed.
+     * @var array
+     */
+    protected $allowedFields = [
+        'user_id',
+        'total_price',
+        'created_at'
+    ];
 }

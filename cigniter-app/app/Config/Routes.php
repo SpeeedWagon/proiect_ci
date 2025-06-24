@@ -11,15 +11,14 @@ $routes = Services::routes();
  * --------------------------------------------------------------------
  */
 $routes->setDefaultNamespace('App\Controllers');
-$routes->setDefaultController('Home');
+$routes->setDefaultController('Shop'); // Change from 'Home' to our new 'Shop' controller
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
 $routes->set404Override();
-// The Auto Routing (Legacy) is very dangerous. It is easy to create vulnerable apps
-// where controller filters or CSRF protection are bypassed.
-// If you don't want to define all routes, please use the Auto Routing (Improved).
-// Set `$autoRoutesImproved` to true in `app/Config/Feature.php` and set the following to true.
-// $routes->setAutoRoute(false);
+// The Auto Routing (Legacy) is very convenient but creates unpredictable
+// routes that may conflict with defined routes. It's recommended that you
+// disable auto-routing and define all of your routes explicitly.
+$routes->setAutoRoute(false); // Explicitly set to false for better security and organization
 
 /*
  * --------------------------------------------------------------------
@@ -29,7 +28,54 @@ $routes->set404Override();
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'WelcomeController::index');
+
+// === PUBLIC ROUTES ===
+// Accessible to everyone, no login required.
+$routes->get('/', 'Shop::index');
+
+// Authentication routes
+$routes->get('register', 'AuthController::register');
+$routes->post('register', 'AuthController::attemptRegister');
+$routes->get('login', 'AuthController::login');
+$routes->post('login', 'AuthController::attemptLogin');
+$routes->get('logout', 'AuthController::logout');
+
+
+// === LOGGED-IN USER ROUTES ===
+// This group requires the user to be logged in. The 'auth' filter will
+// automatically redirect guests to the login page.
+$routes->group('', ['filter' => 'auth'], static function ($routes) {
+    
+    // Order routes
+    $routes->get('orders', 'OrdersController::index');
+    $routes->post('orders/create', 'OrdersController::checkout'); // Using POST for the checkout action
+    
+    // Cart routes that require login (e.g., viewing, clearing)
+    $routes->get('cart', 'Cart::index');
+    $routes->get('cart/clear', 'Cart::clear');
+    $routes->get('cart/remove/(:num)', 'Cart::remove/$1');
+});
+
+// Adding an item to the cart can be public (doesn't need the filter group).
+$routes->post('cart/add', 'Cart::add');
+
+
+// === ADMIN-ONLY ROUTES ===
+// This group uses our 'admin_area' filter group, which first runs 'auth',
+// then runs 'admin'. It also prefixes all routes with '/admin'.
+$routes->group('admin', ['filter' => 'admin_area'], static function ($routes) {
+
+    // Admin Dashboard
+    $routes->get('/', 'AdminController::dashboard'); // Maps to /admin
+
+    // Example routes for managing products
+    $routes->get('products', 'Admin\ProductController::index');     // Maps to /admin/products
+    $routes->get('products/new', 'Admin\ProductController::new');      // Maps to /admin/products/new
+    $routes->post('products/create', 'Admin\ProductController::create');  // Maps to /admin/products/create
+
+    // You would add more admin-specific routes here, e.g., for managing users or orders.
+});
+
 
 /*
  * --------------------------------------------------------------------

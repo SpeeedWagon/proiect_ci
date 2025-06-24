@@ -6,6 +6,7 @@ services:
       - ./cigniter-app:/var/www/html
     ports:
       - 8080:80
+    command: sh -c "chown -R www-data:www-data /var/www/html/writable && apache2-foreground"
   
   mysql_db:
     image: mysql:latest
