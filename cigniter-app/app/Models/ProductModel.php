@@ -4,13 +4,13 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class UserModel extends Model
+class ProductModel extends Model
 {
     /**
      * The table associated with this model.
      * @var string
      */
-    protected $table = 'users';
+    protected $table = 'products';
 
     /**
      * The primary key of the table.
@@ -19,14 +19,13 @@ class UserModel extends Model
     protected $primaryKey = 'id';
 
     /**
-     * Fields that are allowed to be inserted or updated.
-     * This is a security feature to prevent mass-assignment vulnerabilities.
+     * Fields that are allowed to be saved.
      * @var array
      */
     protected $allowedFields = [
-        'username',
-        'email',
-        'password_hash',
-        'role'
+        'name',
+        'description',
+        'price',
+        'image_url'
     ];
 }

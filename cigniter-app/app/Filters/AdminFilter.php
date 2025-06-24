@@ -9,14 +9,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 class AdminFilter implements FilterInterface
 {
     /**
-     * Do whatever processing this filter needs to do.
-     * By default it should not return anything during
-     * normal execution. However, when an abnormal state
-     * is found, it should return an instance of
-     * CodeIgniter\HTTP\Response. If it does, script
-     * execution will end and that Response will be
-     * sent back to the client, allowing for error pages,
-     * redirects, etc.
+     * This method checks if a logged-in user has the 'admin' role.
+     * It is designed to be run AFTER the AuthFilter.
      *
      * @param RequestInterface $request
      * @param array|null       $arguments
@@ -25,14 +19,20 @@ class AdminFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        //
+        // Check if the 'role' session key is set to 'admin'.
+        if (session()->get('role') !== 'admin') {
+            // The user is logged in but is not an administrator.
+
+            // It's good practice to not reveal that an admin page exists.
+            // Redirecting to the homepage with a generic error is a good approach.
+            return redirect()->to('/')->with('error', 'You do not have permission to access that page.');
+        }
+
+        // If the check passes (user is an admin), allow the request to proceed.
     }
 
     /**
-     * Allows After filters to inspect and modify the response
-     * object as needed. This method does not allow any way
-     * to stop execution of other after filters, short of
-     * throwing an Exception or Error.
+     * We don't need to do anything after the controller has run.
      *
      * @param RequestInterface  $request
      * @param ResponseInterface $response
@@ -42,6 +42,6 @@ class AdminFilter implements FilterInterface
      */
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        //
+        // No action needed.
     }
 }

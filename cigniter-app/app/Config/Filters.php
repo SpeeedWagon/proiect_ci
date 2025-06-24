@@ -9,11 +9,18 @@ use CodeIgniter\Filters\Honeypot;
 use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\SecureHeaders;
 
+// === NEW/MODIFIED SECTION: Import your custom filters ===
+use App\Filters\AdminFilter;
+use App\Filters\AuthFilter;
+
 class Filters extends BaseConfig
 {
     /**
      * Configures aliases for Filter classes to
      * make reading things nicer and simpler.
+     *
+     * @var array<string, string>
+     * @phpstan-var array<string, class-string>
      */
     public array $aliases = [
         'csrf'          => CSRF::class,
@@ -21,16 +28,22 @@ class Filters extends BaseConfig
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
+        // === NEW/MODIFIED SECTION: Add aliases for your custom filters ===
+        'auth'          => AuthFilter::class,    // For any logged-in user
+        'admin'         => AdminFilter::class,   // For admin-only users
     ];
 
     /**
      * List of filter aliases that are always
      * applied before and after every request.
+     *
+     * @var array<string, array<string, array<string, string>>>|array<string, array<string>>
+     * @phpstan-var array<string, list<string>>|array<string, array<string, array<string, string>>>
      */
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf', // CSRF protection is highly recommended for all POST requests
             // 'invalidchars',
         ],
         'after' => [
@@ -47,9 +60,10 @@ class Filters extends BaseConfig
      * Example:
      * 'post' => ['foo', 'bar']
      *
-     * If you use this, you should disable auto-routing because auto-routing
-     * permits any HTTP method to access a controller. Accessing the controller
-     * with a method you don’t expect could bypass the filter.
+     * If you use this, you should remove those aliases
+     * from this specific method from the globals array.
+     *
+     * @var array<string, list<string>>
      */
     public array $methods = [];
 
@@ -59,6 +73,16 @@ class Filters extends BaseConfig
      *
      * Example:
      * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
+     *
+     * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+        // === NEW/MODIFIED SECTION: Define your filter groups ===
+        'admin_area' => [
+            'before' => [
+                'auth',  // This filter runs first
+                'admin', // This filter runs second
+            ],
+        ],
+    ];
 }
